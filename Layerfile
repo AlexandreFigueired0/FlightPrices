@@ -20,6 +20,6 @@ RUN apt-get update && \
 # copy files from the repository into this staging server
 COPY . .
 
-RUN pip install -r requirements.txt
+RUN pip3 install -r tests/requirements.txt
 RUN pytest -v --cov
 
