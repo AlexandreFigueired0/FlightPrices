@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, '/home/alexandref/FCUL/FlightPrices')
+sys.path.insert(0, '/')
 from utils.date_utils import get_next_day
 
 class TestDateUtils():
