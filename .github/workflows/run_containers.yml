@@ -11,3 +11,9 @@ jobs:
       - uses: actions/setup-python@v5.1.0
       - name: Run all containers
         run: ./run_containers.sh
+      - name: Test visualization endpoints
+        run: curl localhost:8084/api/visualization/airlines/DL && curl localhost:8084/api/visualization/tickets/BOS/ATL
+      - name: Test ranking endpoints
+        run: curl localhost:8082/api/ranking/airlines_by_ticket_price
+      - name: Test forecast endpoints
+        run: curl curl localhost:8080/api/forecast/chepeast/BOS/ATL/2024-08-10/2024-08-20
