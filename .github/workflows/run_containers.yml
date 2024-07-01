@@ -1,4 +1,4 @@
-name: Deploy containers
+name: Test container deployment
 
 on: ["push", "pull_request"]
 
@@ -11,6 +11,7 @@ jobs:
       - uses: actions/setup-python@v5.1.0
       - name: Run all containers
         run: ./run_containers.sh
-        # Fazer script python em vez de isto e correr o script que teste os endpoints
+      - name: Install dependencies
+        run: pip install -r tests/requirements.txt
       - name: Test container endpoints
         run: pytest tests/test_containers_endpoints.py -v
