@@ -12,4 +12,4 @@ jobs:
       - name: Install dependencieds
         run: pip install -r tests/requirements.txt
       - name: Run tests
-        run: pytest -v
+        run: pytest tests/test_date_utils.py -v

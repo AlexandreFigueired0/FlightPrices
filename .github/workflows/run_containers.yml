@@ -11,11 +11,6 @@ jobs:
       - uses: actions/setup-python@v5.1.0
       - name: Run all containers
         run: ./run_containers.sh
-      - name: Test visualization airlines endpoint
-        run: curl localhost:8084/api/visualization/airlines/DL
-      - name: Test visualization tickets endpoint
-        run: curl localhost:8084/api/visualization/tickets/BOS/ATL
-      - name: Test ranking endpoint
-        run: curl localhost:8082/api/ranking/airlines_by_ticket_price
-      - name: Test forecast endpoint
-        run: curl curl localhost:8080/api/forecast/chepeast/BOS/ATL/2024-08-10/2024-08-20
+        # Fazer script python em vez de isto e correr o script que teste os endpoints
+      - name: Test container endpoints
+        run: pytest tests/test_containers_endpoints.py -v
