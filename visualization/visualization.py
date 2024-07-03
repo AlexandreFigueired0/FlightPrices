@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 import grpc
 import os
 import time
@@ -32,7 +32,21 @@ def get_tickets_from_to(departure, arrival):
 
     tickets_response = database_visualization_client.GetTickets(tickets_request)
 
-    return f"list of tickets: {tickets_response.tickets}"
+        # Helper function to convert a Ticket object into a dictionary
+    def ticket_to_dict(ticket):
+        return {
+            "ticket_id": ticket.leg_id,
+            "departure": ticket.departure_place,
+            "arrival": ticket.arrival_place,
+            "price": ticket.total_fare,
+            "flight_date": ticket.flight_date,
+            # Add other relevant fields here
+        }
+
+    # Convert each Ticket object in the response to a dictionary
+    tickets_list = [ticket_to_dict(ticket) for ticket in tickets_response.tickets]
+
+    return jsonify({ "tickets": tickets_list })
 
 @app.route("/api/visualization/airlines/<airline_code>", methods=["GET"])
 def get_airline_details(airline_code):
@@ -41,7 +55,7 @@ def get_airline_details(airline_code):
     
     airline_response = database_visualization_client.GetAirline(airline_request)
 
-    return f"airlineCode: {airline_response.airline.airline_code} | airlineName: {airline_response.airline.airline_name}"
+    return jsonify({"airlineCode": str(airline_response.airline.airline_code), "airlineName": str(airline_response.airline.airline_name)})
 
 @app.route("/api/visualization/liveness-check", methods=['GET'])
 def liveness_check():

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 import time
 import random
 import psutil
@@ -70,7 +70,7 @@ def forecast_cheapest(departure, arrival, start_date, end_date):
 
         curr_date = get_next_day(curr_date)
 
-    return f"forecast of cheapest ticket: {res}"
+    return jsonify({"price" : res})
 
 @app.route("/api/forecast/liveness-check", methods=['GET'])
 def liveness_check():
