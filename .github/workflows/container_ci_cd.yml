@@ -3,11 +3,9 @@ name: Test containers and publish to Docker Hub
 on:
   push:
     branches:
-      - main
       - master
   pull_request:
     branches:
-      - main
       - master
 
 jobs:
@@ -38,6 +36,9 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: List directory structure
+        run: ls -la
 
       - name: Build and push database-visualization image
         uses: docker/build-push-action@v6
