@@ -25,7 +25,7 @@ jobs:
       - name: Test endpoints
         run: pytest tests -v
 
-  publish:
+  publish-db-visualization:
     runs-on: ubuntu-latest
     needs: test
     steps:
@@ -48,3 +48,171 @@ jobs:
           file: ./database-visualization/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/database-visualization-container:latest
+
+  publish-db-ranking:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_NAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push database-ranking image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./database-ranking
+          file: ./database-ranking/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_NAME }}/database-ranking-container:latest
+
+  publish-authentication:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_NAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push authentication image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./authentication
+          file: ./authentication/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_NAME }}/authentication-container:latest
+
+  publish-forecast:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_NAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push forecast image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./forecast
+          file: ./forecast/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_NAME }}/forecast-container:latest
+
+  publish-management:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_NAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push management image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./management
+          file: ./management/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_NAME }}/management-container:latest
+
+  publish-ranking:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_NAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push ranking image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./ranking
+          file: ./ranking/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_NAME }}/ranking-container:latest
+
+  publish-recommendations:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_NAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push recommendations image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./recommendations
+          file: ./recommendations/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_NAME }}/recommendations-container:latest
+
+  publish-visualization:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_NAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push visualization image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./visualization
+          file: ./visualization/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_NAME }}/visualization-container:latest
