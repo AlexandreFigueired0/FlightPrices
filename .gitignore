@@ -1,3 +1,2 @@
 spark/subset_data.csv
-*key.json
-.secrets
+key.json
