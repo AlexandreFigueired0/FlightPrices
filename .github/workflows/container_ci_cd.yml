@@ -43,6 +43,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./database-visualization/Dockerfile
+          file: database-visualization/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/database-visualization-container:latest
