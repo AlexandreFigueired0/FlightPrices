@@ -17,9 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5.1.0
+        with:
+          python-version: "3.10"
       - name: Run all containers
         run: ./run_containers.sh
-      - name: Install dependencies
+      - name: Install dependencies to run tests
         run: pip install -r tests/requirements.txt
       - name: Test endpoints
         run: pytest tests -v
@@ -40,5 +42,7 @@ jobs:
       - name: Build and push database-visualization image
         uses: docker/build-push-action@v6
         with:
+          context: .
+          file: ./database-visualization/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/database-visualization-container:latest
