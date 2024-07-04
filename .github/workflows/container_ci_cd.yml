@@ -36,12 +36,5 @@ jobs:
           username: ${{ secrets.DOCKER_NAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and push database-visualization image
-        uses: docker/build-push-action@v6
-        with:
-          file: database-visualization/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_NAME }}/database-visualization-container:latest
+      - name: push database-visualization image
+        run: ./push_images_dockerhub.sh
