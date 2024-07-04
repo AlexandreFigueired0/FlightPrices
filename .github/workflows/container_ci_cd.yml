@@ -39,10 +39,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Debug
+        run: ls
+
       - name: Build and push database-visualization image
         uses: docker/build-push-action@v6
         with:
-          context: database-visualization
+          context: .
           file: Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/database-visualization-container:latest
