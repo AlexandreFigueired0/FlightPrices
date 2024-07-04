@@ -149,6 +149,6 @@ def serve():
 
 client = None
 if __name__ == "__main__":
-    credentials = service_account.Credentials.from_service_account_file(filename="visualization_key.json")
+    credentials = service_account.Credentials.from_service_account_file(filename="key.json")
     client = bigquery.Client(credentials=credentials)
     serve()

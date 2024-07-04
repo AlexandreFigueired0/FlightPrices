@@ -1,0 +1,44 @@
+name: Test containers and publish to Docker Hub
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5.1.0
+      - name: Run all containers
+        run: ./run_containers.sh
+      - name: Install dependencies
+        run: pip install -r tests/requirements.txt
+      - name: Test endpoints
+        run: pytest tests -v
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_NAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push database-visualization image
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ${{ secrets.DOCKER_NAME }}/database-visualization-container:latest
