@@ -1,5 +1,5 @@
-gcloud auth activate-service-account disco-parsec-415719@appspot.gserviceaccount.com --key-file=database-visualization/visualization_key.json
-yes | gcloud config set project disco-parsec-415719
+gcloud auth login
+gcloud config set project disco-parsec-415719
 
 # default MACHINE_TYPE: e2-medium
 # gcloud container clusters create-auto cn19-cluster --region=europe-west4 #nmbr nodes, tipo de maquina
