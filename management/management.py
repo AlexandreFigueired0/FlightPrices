@@ -1,19 +1,13 @@
-from flask import Flask, redirect, render_template, session, url_for, request
+from flask import Flask, request
 import grpc
 import os
-import jwt
-import requests
-import time
-import random
 import psutil
 
-from visualization_pb2 import Ticket, TicketsRequest, Airline, AirlineRequest, VisualizationInsertionRequest, \
-                                 VisualizationDeleteRequest
+from visualization_pb2 import Ticket, Airline, VisualizationInsertionRequest, VisualizationDeleteRequest
 from visualization_pb2_grpc import VisualizationStub
-from ranking_pb2 import AirlinesRankingByTicketPriceRequest, AirlinesRankingByTicketPriceResponse, \
-                         RankingInsertionRequest, RankingDeleteRequest, AirlineRanking
+from ranking_pb2 import RankingInsertionRequest, RankingDeleteRequest, AirlineRanking
 from ranking_pb2_grpc import RankingStub
-from prometheus_client import start_http_server, Summary, Histogram, CONTENT_TYPE_LATEST, generate_latest, Counter, Gauge
+from prometheus_client import generate_latest, Counter, Gauge
 
 # app = Flask(__name__)
 
@@ -35,6 +29,7 @@ request_counter = Counter("requests_counter_management", "Total number of reques
 cpu_usage = Gauge('cpu_usage_percent_management', 'CPU Usage Percentage of management')
 memory_usage = Gauge('memory_usage_percent_management', 'Memory Usage Percentage of management')
 
+
 @app.route("/api/management/tickets", methods=['POST'])
 def add_tickets():
     request_counter.inc(1)
@@ -51,7 +46,7 @@ def add_tickets():
         total_fare=ticket_body['total_fare'],
         travel_duration=ticket_body['travel_duration'],
         total_travel_distance=ticket_body['total_travel_distance'],
-        is_refundable= ticket_body['is_refundable'],
+        is_refundable=ticket_body['is_refundable'],
         is_non_stop=ticket_body['is_non_stop']
     )
 
@@ -60,18 +55,22 @@ def add_tickets():
     for airline_body in airlines_body:
         airline = Airline(
             airline_code=airline_body["airline_code"],
-            airline_name = airline_body["airline_name"]
+            airline_name=airline_body["airline_name"]
         )
         airlineRanking = AirlineRanking(
             airline_code=airline_body["airline_code"],
-            airline_name = airline_body["airline_name"]
+            airline_name=airline_body["airline_name"]
         )
 
         airlines.append(airline)
         airlinesRanking.append(airlineRanking)
 
     visualization_insertion_request = VisualizationInsertionRequest(ticket=ticket, airlines=airlines)
-    ranking_insertion_request = RankingInsertionRequest(leg_id = ticket.leg_id, price=ticket.total_fare, airlines=airlinesRanking)
+    ranking_insertion_request = RankingInsertionRequest(
+                                    leg_id=ticket.leg_id,
+                                    price=ticket.total_fare,
+                                    airlines=airlinesRanking
+                                    )
 
     # Add the ticket to the tickets database
     tickets_response = database_visualization_client.AddTicket(visualization_insertion_request)
@@ -81,9 +80,10 @@ def add_tickets():
     if tickets_response == "error":
         return "Error adding ticket to the visualization database"
     if ranking_response == "error":
-        return "Error adding airline price to the ranking database"    
+        return "Error adding airline price to the ranking database"
 
     return "Ticket added successfully"
+
 
 @app.route("/api/management/tickets/<leg_id>", methods=['DELETE'])
 def delete_ticket(leg_id):
@@ -92,7 +92,7 @@ def delete_ticket(leg_id):
     # Delete the ticket from the tickets database
     # tickets_response = database_visualization_client.DeleteTicket(TicketsRequest(ticket_id=ticketId))
 
-    #Remove ticket from ranking database
+    # Remove ticket from ranking database
     ranking_delete_request = RankingDeleteRequest(leg_id=leg_id)
     ranking_delete_response = database_ranking_client.DeleteTicket(ranking_delete_request)
 
@@ -107,12 +107,14 @@ def delete_ticket(leg_id):
 
     return "Ticket deleted successfully"
 
+
 @app.route("/api/management/liveness-check", methods=['GET'])
 def liveness_check():
-    return "ok",200
+    return "ok", 200
+
 
 @app.route("/metrics", methods=['GET'])
 def prometheus_metrics():
     cpu_usage.set(psutil.cpu_percent())
     memory_usage.set(psutil.virtual_memory().percent)
-    return generate_latest() 
+    return generate_latest()

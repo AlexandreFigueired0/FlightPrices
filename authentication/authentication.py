@@ -1,13 +1,10 @@
-from flask import Flask, redirect, render_template, session, url_for, make_response
-from urllib.parse import quote_plus, urlencode
+from flask import Flask, redirect, session, url_for, make_response
 
 from authlib.integrations.flask_client import OAuth
-from dotenv import find_dotenv, load_dotenv
 import os
-
 import psutil
 
-from prometheus_client import start_http_server, Summary, Histogram, CONTENT_TYPE_LATEST, generate_latest, Counter, Gauge
+from prometheus_client import generate_latest, Counter, Gauge
 
 # AUTH0_CLIENT_ID="oyp940gN2eaffEZjgdHvFKSCfprngFmY"
 # AUTH0_CLIENT_SECRET="_bb5JwYk_enfIaVrWt9kKqLDcwWSKAt--zLDHJAZOULdrnMwmrgtjD3FJhITSRAz"
@@ -37,12 +34,14 @@ request_counter = Counter("requests_counter_authentication", "Total number of re
 cpu_usage = Gauge('cpu_usage_percent_authentication', 'CPU Usage Percentage of authentication')
 memory_usage = Gauge('memory_usage_percent_authentication', 'Memory Usage Percentage of authentication')
 
+
 @app.route("/api/authentication/see_id")
 def see_token():
     request_counter.inc(1)
     response = make_response()
     response.set_cookie("user_id", session["user"]["userinfo"]["sub"])
     return response
+
 
 @app.route("/api/authentication/login")
 def login():
@@ -51,6 +50,7 @@ def login():
         redirect_uri=url_for("callback", _external=True)
     )
 
+
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
     request_counter.inc(1)
@@ -58,28 +58,14 @@ def callback():
     session["user"] = token
     return redirect("/api/authentication/see_id")
 
-@app.route("/api/authentication/logout")
-def logout():
-    request_counter.inc(1)
-    session.clear()
-    return redirect(
-        "https://" + env.get("AUTH0_DOMAIN")
-        + "/v2/api/authentication/logout?"
-        + urlencode(
-            {
-                "returnTo": url_for("home", _external=True),
-                "client_id": env.get("AUTH0_CLIENT_ID"),
-            },
-            quote_via=quote_plus,
-        )
-    )
 
 @app.route("/api/authentication/liveness-check", methods=['GET'])
 def liveness_check():
-    return "ok",200
+    return "ok", 200
+
 
 @app.route("/metrics", methods=['GET'])
 def prometheus_metrics():
     cpu_usage.set(psutil.cpu_percent())
     memory_usage.set(psutil.virtual_memory().percent)
-    return generate_latest() 
+    return generate_latest()

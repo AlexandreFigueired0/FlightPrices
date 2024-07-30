@@ -1,13 +1,15 @@
+"""
+Visualization service
+"""
+
 from flask import Flask, jsonify
 import grpc
 import os
-import time
-import random
 import psutil
 
-from visualization_pb2 import Ticket, TicketsRequest, Airline, AirlineRequest
+from visualization_pb2 import TicketsRequest, AirlineRequest
 from visualization_pb2_grpc import VisualizationStub
-from prometheus_client import start_http_server, Summary, Histogram, CONTENT_TYPE_LATEST, generate_latest, Counter, Gauge, CollectorRegistry
+from prometheus_client import generate_latest, Counter, Gauge
 
 app = Flask(__name__)
 
@@ -17,13 +19,16 @@ database_visualization_channel = grpc.insecure_channel(f"{database_visualization
 database_visualization_client = VisualizationStub(database_visualization_channel)
 
 # prometheus metrics
-request_counter = Counter("requests_counter_visualization", "Total number of requests of visualization")
+request_counter = Counter("requests_counter_visualization", "Number of requests of visualization")
 cpu_usage = Gauge('cpu_usage_percent_visualization', 'CPU Usage Percentage of visualization')
-memory_usage = Gauge('memory_usage_percent_visualization', 'Memory Usage Percentage of visualization')
+memory_usage = Gauge('mem_usage_percent_visualization', 'Mem Usage Percentage of visualization')
 
 
 @app.route("/api/visualization/tickets/<departure>/<arrival>", methods=["GET"])
 def get_tickets_from_to(departure, arrival):
+    """
+    Get tickets from departure to arrival
+    """
     request_counter.inc(1)
     tickets_request = TicketsRequest(
         departure_place=departure,
@@ -32,8 +37,10 @@ def get_tickets_from_to(departure, arrival):
 
     tickets_response = database_visualization_client.GetTickets(tickets_request)
 
-        # Helper function to convert a Ticket object into a dictionary
     def ticket_to_dict(ticket):
+        """
+        Convert a Ticket object into a dictionary
+        """
         return {
             "ticket_id": ticket.leg_id,
             "departure": ticket.departure_place,
@@ -46,27 +53,42 @@ def get_tickets_from_to(departure, arrival):
     # Convert each Ticket object in the response to a dictionary
     tickets_list = [ticket_to_dict(ticket) for ticket in tickets_response.tickets]
 
-    return jsonify({ "tickets": tickets_list })
+    return jsonify({"tickets": tickets_list})
+
 
 @app.route("/api/visualization/airlines/<airline_code>", methods=["GET"])
 def get_airline_details(airline_code):
+    """
+    Get airline details
+    """
     request_counter.inc(1)
     airline_request = AirlineRequest(airline_code=airline_code)
-    
+
     airline_response = database_visualization_client.GetAirline(airline_request)
 
-    return jsonify({"airlineCode": str(airline_response.airline.airline_code), "airlineName": str(airline_response.airline.airline_name)})
+    return jsonify({
+        "airlineCode": str(airline_response.airline.airline_code),
+        "airlineName": str(airline_response.airline.airline_name)
+        })
+
 
 @app.route("/api/visualization/liveness-check", methods=['GET'])
 def liveness_check():
-    return "ok",200
+    """
+    Liveness check
+    """
+    return "ok", 200
 
 # @app.route("/api/visualization/metrics", methods=['GET'])
 # def metrics():
-#     return "ok",200    
+#     return "ok",200
+
 
 @app.route("/metrics", methods=['GET'])
 def prometheus_metrics():
+    """
+    Prometheus metrics
+    """
     cpu_usage.set(psutil.cpu_percent())
     memory_usage.set(psutil.virtual_memory().percent)
-    return generate_latest() 
+    return generate_latest()

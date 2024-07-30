@@ -1,18 +1,10 @@
 from flask import Flask, jsonify
-import time
-import random
 import psutil
-from pyspark.sql import SparkSession
-from pyspark.ml.feature import StringIndexer
-from pyspark.ml.feature import VectorAssembler
-from pyspark.ml.regression import LinearRegression
-from pyspark.sql.functions import col
 
-from prometheus_client import start_http_server, Summary, Histogram, CONTENT_TYPE_LATEST, generate_latest, Counter, Gauge
+from prometheus_client import generate_latest, Counter, Gauge
 from pyspark.sql import SparkSession
 from pyspark.ml.feature import StringIndexerModel, VectorAssembler
 from pyspark.ml.regression import LinearRegressionModel
-import numpy
 from datetime import datetime, timedelta
 import functools
 
@@ -33,19 +25,30 @@ request_counter = Counter("requests_counter_forecast", "Total number of requests
 cpu_usage = Gauge('cpu_usage_percent_forecast', 'CPU Usage Percentage of forecast')
 memory_usage = Gauge('memory_usage_percent_forecast', 'Memory Usage Percentage of forecast')
 
+
 def get_next_day(date_str):
     date_obj = datetime.strptime(date_str, '%Y-%m-%d')
     next_day_obj = date_obj + timedelta(days=1)
     next_day_str = next_day_obj.strftime('%Y-%m-%d')
     return next_day_str
 
+
 @functools.lru_cache(maxsize=366)
 def pred_ticket_price_in_date_start_end_airport(date, startingAirport, destinationAirport):
     date_array = date.split("-")
     date_array[0] = "2022"
     date_formatted = "-".join(date_array)
-    assembler = VectorAssembler(inputCols=["flightDate_indexed", "startingAirport_indexed", "destinationAirport_indexed"], outputCol="features")
-    df = spark.createDataFrame([{"flightDate": date_formatted, "startingAirport": startingAirport, "destinationAirport": destinationAirport}])
+    assembler = VectorAssembler(
+        inputCols=["flightDate_indexed", "startingAirport_indexed", "destinationAirport_indexed"],
+        outputCol="features"
+        )
+    df = spark.createDataFrame(
+        [{
+            "flightDate": date_formatted,
+            "startingAirport": startingAirport,
+            "destinationAirport": destinationAirport
+        }]
+    )
 
     # Apply the same StringIndexer models
     fdJob = flightDateModel.transform(df)
@@ -57,6 +60,7 @@ def pred_ticket_price_in_date_start_end_airport(date, startingAirport, destinati
     predictions = model.transform(data_3)
 
     return predictions.first()[-1]
+
 
 @app.route("/api/forecast/chepeast/<departure>/<arrival>/<start_date>/<end_date>", methods=['GET'])
 def forecast_cheapest(departure, arrival, start_date, end_date):
@@ -70,14 +74,16 @@ def forecast_cheapest(departure, arrival, start_date, end_date):
 
         curr_date = get_next_day(curr_date)
 
-    return jsonify({"price" : res})
+    return jsonify({"price": res})
+
 
 @app.route("/api/forecast/liveness-check", methods=['GET'])
 def liveness_check():
-    return "ok",200
+    return "ok", 200
+
 
 @app.route("/metrics", methods=['GET'])
 def prometheus_metrics():
     cpu_usage.set(psutil.cpu_percent())
     memory_usage.set(psutil.virtual_memory().percent)
-    return generate_latest() 
+    return generate_latest()
