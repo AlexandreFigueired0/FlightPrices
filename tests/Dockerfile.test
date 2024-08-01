@@ -1,0 +1,19 @@
+FROM python:3.10-slim
+
+RUN mkdir /app
+WORKDIR /app
+
+RUN mkdir visualization
+RUN mkdir tests
+RUN mkdir utils
+
+COPY ./visualization visualization
+COPY ./tests tests
+COPY ./utils utils
+
+RUN pip install -r visualization/requirements.txt
+RUN pip install -r tests/requirements.txt
+
+ENV PYTHONPATH=/app:/app/visualization:/app/utils
+
+ENTRYPOINT ["pytest", "tests/test_visualization.py", "-v"]

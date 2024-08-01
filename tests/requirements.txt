@@ -1,3 +1,1 @@
-pytest ~= 6.2.5
-pytest-cov
-requests
+pytest~=8.3.2
