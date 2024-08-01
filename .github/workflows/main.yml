@@ -14,15 +14,6 @@ jobs:
         with:
           python-version: "3.10.12"
 
-      - name: Run all containers
-        run: ./run_containers.sh
-
-      - name: Install dependencies to run tests
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install -r tests/requirements.txt
-          pip install flake8 
-
       - name: Lint code
         run: flake8 visualization/visualization.py 
             recommendations/recommendations.py 
@@ -30,8 +21,14 @@ jobs:
             forecast/forecast.py authentication/authentication.py
             --max-line-length=120
 
+      - name: Install dependencies to run tests
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install -r tests/requirements.txt
+          pip install flake8 
+
       - name: Test endpoints
-        run: pytest tests -v
+        run: ./run_tests.sh
 
   publish-db-visualization:
     runs-on: ubuntu-latest

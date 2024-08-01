@@ -5,12 +5,9 @@ docker network inspect microservices &>/dev/null || {
 }
 
 # Startup database services
-cd ../database-ranking
+cd database-visualization
 ./run.sh
 
-cd ../database-visualization
-./run.sh
-
-cd ../tests
-docker build -f Dockerfile.test -t test_visualization ..
-docker run -t --network microservices test_visualization 
+cd ..
+docker build -f tests/Dockerfile.test -t test_visualization .
+docker run --rm -t --network microservices test_visualization 
