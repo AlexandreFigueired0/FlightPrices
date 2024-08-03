@@ -1,2 +1,2 @@
-docker-compose up --build -d database-visualization
-docker-compose up --build test-visualization
+docker build -f tests/Dockerfile.test -t test_visualization .
+docker run --rm -t test_visualization 

@@ -27,19 +27,8 @@ jobs:
             forecast/forecast.py authentication/authentication.py
             --max-line-length=120
 
-      - name: Set up docker-compose
-        run: |
-          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-      
-      - name: Build images
-        run: ./build_images.sh
-
       - name: Run tests
-        run: docker-compose up --build
-      
-      - name: Stop containers
-        run: docker-compose down
+        run: ./run_tests.sh
 
   publish-db-visualization:
     runs-on: ubuntu-latest

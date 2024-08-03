@@ -17,4 +17,4 @@ RUN pip install -r tests/requirements.txt
 ENV PYTHONPATH=/app:/app/visualization:/app/utils
 ENV DATABASE_VISUALIZATION_HOST=database-visualization-container
 
-ENTRYPOINT ["pytest", "tests/test_visualization.py", "-v"]
+ENTRYPOINT ["pytest", "tests", "-v"]
