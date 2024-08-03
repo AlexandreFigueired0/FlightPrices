@@ -11,7 +11,7 @@ def client():
 def test_visualization_liveness_check(client):
     """Test the liveness check endpoint."""
     response = client.get('/api/visualization/liveness-check')
-    assert response.status_code == 200
+    assert response.status_code == 100
     assert response.data.decode() == 'ok'
 
 
