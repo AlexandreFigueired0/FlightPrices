@@ -4,17 +4,30 @@ RUN mkdir /app
 WORKDIR /app
 
 RUN mkdir visualization
+RUN mkdir authentication
+RUN mkdir management
+RUN mkdir ranking
 RUN mkdir tests
 RUN mkdir utils
 
 COPY ./visualization visualization
+COPY ./authentication authentication
+COPY ./management management
+COPY ./ranking ranking
 COPY ./tests tests
 COPY ./utils utils
 
 RUN pip install -r visualization/requirements.txt
+RUN pip install -r authentication/requirements.txt
+# RUN pip install -r forecast/requirements.txt
+RUN pip install -r management/requirements.txt
+RUN pip install -r ranking/requirements.txt
+# RUN pip install -r recomm  endations/requirements.txt
 RUN pip install -r tests/requirements.txt
 
-ENV PYTHONPATH=/app:/app/visualization:/app/utils
+ENV PYTHONPATH=/app:/app/visualization:/app/authentication:/app/utils\
+:/app/forecast:/app/management:/app/ranking:/app/recommendations
+
 ENV DATABASE_VISUALIZATION_HOST=database-visualization-container
 
 ENTRYPOINT ["pytest", "tests", "-v"]
